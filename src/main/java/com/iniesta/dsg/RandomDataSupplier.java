@@ -1,7 +1,6 @@
 package com.iniesta.dsg;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
@@ -45,7 +44,7 @@ public class RandomDataSupplier {
 		return random.nextInt(top);
 	}
 	
-	public double getRandomDouble(int top) {
+	public double getRandomDouble(double top) {
 		return random.nextDouble()*top+1;
 	}
 		
@@ -117,11 +116,41 @@ public class RandomDataSupplier {
 	}
 
 	public String getRandomDouble(int top, int decimals) {
+		return format(getRandomDouble(top), decimals);
+	}
+	
+	private String format(double number, int decimals) {
 		String pattern = "#.";
 		for (int i = 0; i < decimals; i++) {
 			pattern += "#";
 		}
 		DecimalFormat df = new DecimalFormat(pattern);
-		return df.format(getRandomDouble(top));
+		return df.format(number);
+	}
+	
+	public String getRandomGPSBetween(double maxLat, double maxLon, double minLat, double minLon) {
+		double lat = getRandomDouble(maxLat-minLat)+minLat;
+		double lon = getRandomDouble(maxLon-minLon)+minLon;
+		return format(lat, 6) + "," + format(lon, 6);
+	}
+	
+	public boolean getRandomBoolean() {
+		boolean val = random.nextBoolean();
+		if(!val) {
+			val = random.nextBoolean();
+			if(!val) {
+				val = random.nextBoolean();
+				if(!val) {
+					val = random.nextBoolean();
+					if(!val) {
+						val = random.nextBoolean();
+						if(!val) {
+							val = random.nextBoolean();
+						}
+					}
+				}
+			}
+		}
+		return val;
 	}
 }
