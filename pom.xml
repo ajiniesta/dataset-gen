@@ -5,7 +5,7 @@
 
 	<groupId>com.iniesta</groupId>
 	<artifactId>dataset-gen</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<name>dataset-gen</name>
 	<!-- FIXME change it to the project's website -->
