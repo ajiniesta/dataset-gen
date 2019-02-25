@@ -48,6 +48,13 @@
 					<noDeploy>true</noDeploy>
 					<scmCommentPrefix>[RELEASE] </scmCommentPrefix>
 				</configuration>
+				<dependencies>
+			    <dependency>
+			      <groupId>com.jcraft</groupId>
+			      <artifactId>jsch</artifactId>
+			      <version>0.1.54</version>
+			    </dependency>
+			  </dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
