@@ -1,6 +1,10 @@
 package com.iniesta.dsg;
 
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -9,19 +13,21 @@ public abstract class DataSet {
 
 	final static Logger logger = Logger.getLogger(DataSet.class);
 
-	public final static String STREAM = "stream";
-	public final static String DS_SHOP = "ds-shop";
-	public final static String DS_NAS = "ds-nas";
+	public final static String DS_SHOP = "dsshop";
+	public final static String DS_NAS = "dsnas";
 
 	private String separator;
 	private String output;
 	private int length;
 	protected String dataset;
 
-	public DataSet(String separator, String output, int length) {
-		this.separator = separator;
-		this.output = output;
-		this.length = length;
+	private InputConf iconf;
+
+	public DataSet(InputConf iconf) {
+		this.iconf = iconf;
+		this.separator = iconf.getSeparator();
+		this.output = iconf.getOutput();
+		this.length = iconf.getLength();
 	}
 
 	public abstract List<String> getLineSchema();
@@ -56,17 +62,41 @@ public abstract class DataSet {
 		}
 	}
 
+	public void stream() {
+		logger.info(String.format("Connecting to %s:%s", iconf.getHost(), iconf.getPort()));
+		try (Socket socket = new Socket(InetAddress.getByName(iconf.getHost()), iconf.getPort())){			
+			PrintWriter printer = new PrintWriter(socket.getOutputStream(), true);
+			logger.info(String.format("Connected to %s:%s", iconf.getHost(), iconf.getPort()));
+			int i = 0;
+			do {
+				printer.print(getLine());
+				printer.flush();
+				if (i % 100 == 0) {
+					logger.info(String.format("Sending %s lines to stream", i));
+				}
+				i++;
+				Thread.sleep(getInc());
+			} while(true);
+		} catch (IOException | InterruptedException e) {
+			logger.error("Error during the streaming...", e);
+		}
+		
+	}
 
-	public static DataSet getFactory(String type, String separator, String output, int length) {
-		switch (type) {
-		case STREAM:
-			return null;
+	public static DataSet getFactory(InputConf iconf) {
+		switch (iconf.getType()) {
 		case DS_SHOP:
-			return new DataSetShop(separator, output, length);
+			return new DataSetShop(iconf);
 		case DS_NAS:
-			return null;
+			return new DataSetNas(iconf);
 		default:
 			return null;
 		}
 	}
+
+	public int getInc() {
+		return 1000;
+	}
+
+	
 }
